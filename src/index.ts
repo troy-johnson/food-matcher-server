@@ -1,10 +1,27 @@
-import express from 'express';
+import * as express from 'express';
+import routes from './routes';
 
 const app = express();
-const PORT = 8000;
 
-app.get('/', (req, res) => res.send('Express + TypeScript Server'));
+const port = 3000;
+const router = express.Router();
 
-app.listen(PORT, () => {
-   console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
+app.use('/', router);
+app.use('/session', routes.session);
+
+export const startServer = () => app.listen(port, () => {
+   console.log(`Server running on port ${port}`);
 });
+
+if (require.main === module) {
+   const server = startServer();
+   const shutdown = () => {
+      server.close();
+      db.end();
+   };
+
+   process.on('SIGTERM', shutdown);
+   process.on('SIGINT', shutdown);
+}
+
+export default app;
